@@ -1,0 +1,12 @@
+version: '3'
+services:
+  r2b:
+    image: 52north/read2burn:1.0
+    container_name: read2burn
+    restart: unless-stopped
+    ports:
+      - 3300:3300
+#    volumes:
+#      - ./data:/app/data
+#    environment:
+#      - REL_PATH=/r2b

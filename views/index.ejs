@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<!--[if lt IE 7 ]><html class="ie ie6" lang="<%= getLocale() %>"> <![endif]-->
-<!--[if IE 7 ]><html class="ie ie7" lang="<%= getLocale() %>"> <![endif]-->
-<!--[if IE 8 ]><html class="ie ie8" lang="<%= getLocale() %>"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html lang="<%= getLocale() %>"> <!--<![endif]-->
 <head>
 
     <!-- Basic Page Needs
   ================================================== -->
     <meta charset="utf-8">
-    <title>read2burn</title>
+    <title>52°North | read2burn</title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -23,33 +19,37 @@
     <link rel="stylesheet" href="stylesheets/layout.css">
     <link rel="stylesheet" href="stylesheets/style.css">
 
-    <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
     <!-- Favicons
     ================================================== -->
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <!-- ADD FAVICON PACKAGE -->
+    <link rel="apple-touch-icon" sizes="57x57" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://52north.org/wp-content/themes/52north/images/favicon-package/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon-160x160.png" sizes="160x160">
+    <link rel="icon" type="image/png" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon-32x32.png" sizes="32x32">
+    <link rel="Shortcut Icon" href="https://52north.org/wp-content/themes/52north/images/favicon-package/favicon.ico" type="image/x-icon" />
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="javascripts/jquery-3.6.0.min.js"></script>
     <script src="javascripts/jquery.jqEasyCharCounter.min.js"></script>
 
 </head>
 <body>
 
-
-
-
 <!-- Primary Page Layout
 ================================================== -->
 
-<!-- Delete everything in this .container and get started on your own site! -->
-
 <div class="container">
     <div class="sixteen columns">
+        <img id="logo" src="https://52north.org/wp-content/uploads/2016/06/logo-main.png" />
         <h1 class="title">READ<span class="title-number">2</span>BURN</h1>
         <div class="subtitle">Transfer Secrets Securely</div>
     </div>
@@ -96,7 +96,7 @@
         <div class="sixteen columns"><h6><%= __('What is it all about?') %></h6><p><%= __('Sending secrets by email has some problems. First, the email is sent in clear text, everybody who can read the transmission can read the secret, second the email is stored in the email account of the sender and the recipient! read2burn.com enables a secure transmission by storing the secret encrypted and creating an access url that is valid only once. Therefore a manipulation by others will be recognized.') %></p></div>
         <div class="sixteen columns"><h6><%= __('Hints') %></h6><p><%= __('Never encrypt login and password together.') %><br/><%= __('Send login and password always separately.') %></p></div>
         <div class="sixteen columns"><h6><%= __('Your data is safe!') %></h6><p><%= __('All transactions are made encrypted. The secret is stored encrypted. The key will not be stored. There is no log, no database, no way to decrypt the secret without the URL.') %></p></div>
-        <div class="sixteen columns"><h6><%= __('Who made it?') %></h6><p><%= __('This service is provided by') %> <a href="http://www.wemove.com/">www.wemove.com</a>.</p></div>
+        <div class="sixteen columns"><h6><%= __('Who made it?') %></h6><p><%= __('This service is provided by') %> <a href="https://52north.org/">52°North Spatial Information Research GmbH</a> and developed my <a target="_blank" href="https://github.com/wemove/read2burn/">wemove.com</a>.</p></div>
     </div>
 </div><!-- container -->
 
@@ -130,19 +130,6 @@
 
 <!-- End Document
 ================================================== -->
-
-<!-- Piwik -->
-<script type="text/javascript">
-    var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.wemove.com/" : "http://piwik.wemove.com/");
-    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-</script><script type="text/javascript">
-    try {
-        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
-        piwikTracker.trackPageView();
-        piwikTracker.enableLinkTracking();
-    } catch( err ) {}
-</script><noscript><p><img src="https://piwik.wemove.com/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
-<!-- End Piwik Tracking Code -->
 
 </body>
 </html>
