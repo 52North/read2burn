@@ -61,3 +61,11 @@ Apache config for sub paths
             RequestHeader set X-Forwarded-Ssl on
     </Location>
 ```
+
+This Apache configuration block sets up a RewriteRule that redirects requests to the root path /r2b to the sub-path /r2b/, using the R=permanent flag to issue a permanent redirect.
+
+The <Location> block that follows defines a block of configuration directives that apply to the /r2b/ sub-path. The ProxyPass and ProxyPassReverse directives tell Apache to proxy requests to the specified URL, which in this case is http://localhost:3300/. The ProxyPreserveHost directive tells Apache to preserve the original host header when proxying the request.
+
+The RequestHeader directives set the X-Forwarded-Proto and X-Forwarded-Ssl headers to "https" and "on", respectively. These headers are often used to indicate to the backend server that the original request was made over a secure connection, even if it is being proxied over an unencrypted connection.
+
+Overall, this configuration block redirects requests to /r2b to /r2b/ and proxies requests to the /r2b/ sub-path to the specified URL, preserving the host header and adding the X-Forwarded-Proto and X-Forwarded-Ssl headers to the proxied request.
