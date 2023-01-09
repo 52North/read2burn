@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       tags:
-        description: "Please provide a git tag value, e.g. v1.0b1. It should be the same version as the read2burn app with added build id."
+        description: "Please provide a git tag value, e.g. v1.0b3. It should be the same version as the read2burn app with added build id."
         required: true
         type: string
-        default: "v1.0b1"
+        default: "v1.0b3"
   push:
     tags:
       - "v*"
@@ -16,6 +16,9 @@ jobs:
   build_and_publish:
     name: docker build publish image
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [ 'javascript' ]
     steps:
       - name: Declare some variables
         id: vars
@@ -25,6 +28,16 @@ jobs:
           echo "build_id=$(echo ${{ github.event.inputs.tags }} | awk -F 'b' '{print $(NF)}')" >> $GITHUB_OUTPUT
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
 
       - name: Set up Docker Buildkit env
         uses: docker/setup-buildx-action@v2
