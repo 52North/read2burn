@@ -1,4 +1,3 @@
-
 /*
  * GET home page.
  */
@@ -67,6 +66,9 @@ exports.index = function (req, res) {
 
 function uid(len) {
 	len = len || 7;
-	return Math.random().toString(35).substr(2, len);
+	var rndStr = Math.random().toString(35).substring(2);
+	if (rndStr.length > len){
+		rndStr = rndStr.substring(0, len)
+	}
+	return rndStr;
 }
-
