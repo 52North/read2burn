@@ -29,7 +29,8 @@ exports.index = function (req, res) {
 			encrypted = cipher.update(secret, 'utf8', 'hex') + cipher.final('hex');
 			const entry = { key, timestamp, encrypted }
 			nedb.insert(entry, function(err, doc) {
-				url = `${req.protocol}://${req.get('host')}/?key=${key + password}`;
+				// see https://expressjs.com/de/api.html#req.originalUrl
+				url = `${req.protocol}://${req.hostname}${req.baseUrl}${req.path}?key=${key + password}`;
 				res.render('index', { url: url, secret: secret, error: undefined, found: false });
 				console.log('Inserted', doc.key, 'with ID', doc._id);
 			});
