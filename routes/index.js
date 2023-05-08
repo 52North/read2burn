@@ -24,12 +24,13 @@ exports.index = function (req, res) {
 			// if exists, create another key
 			const password = uid(PASSWORD_KEY_LENGTH);
 			const timestamp = new Date().getTime();
-			const cipherSecret = Buffer.from(password).toString('binary');
+			const cipherSecret = new Buffer(password).toString('binary');
 			const cipher = crypto.createCipher(CIPHER_ALGORITHM, cipherSecret);
 			encrypted = cipher.update(secret, 'utf8', 'hex') + cipher.final('hex');
 			const entry = { key, timestamp, encrypted }
 			nedb.insert(entry, function(err, doc) {
 				// see https://expressjs.com/de/api.html#req.originalUrl
+				console.log('Request hostname', req.hostname, 'and baseUrl', req.baseUrl, 'and req.path', req.path);
 				url = `${req.protocol}://${req.hostname}${req.baseUrl}${req.path}?key=${key + password}`;
 				res.render('index', { url: url, secret: secret, error: undefined, found: false });
 				console.log('Inserted', doc.key, 'with ID', doc._id);
@@ -43,7 +44,7 @@ exports.index = function (req, res) {
 				try {
 					if (doc.encrypted && req.body.show) {
 						const encrypted = doc.encrypted;
-						const decipherSecret = Buffer.from(password).toString('binary');
+						const decipherSecret = new Buffer(password).toString('binary');
 						const decipher = crypto.createDecipher(CIPHER_ALGORITHM, decipherSecret);
 						const decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
 						nedb.remove({ key }, function(err, numDeleted) {
@@ -67,6 +68,6 @@ exports.index = function (req, res) {
 
 function uid(len) {
 	len = len || 7;
-	return Math.random().toString(35).substring(2, len);
+	return Math.random().toString(35).substr(2, len);
 }
 
