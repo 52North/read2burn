@@ -30,6 +30,7 @@ exports.index = function (req, res) {
 			const entry = { key, timestamp, encrypted }
 			nedb.insert(entry, function(err, doc) {
 				// see https://expressjs.com/de/api.html#req.originalUrl
+				console.log('Request hostname', req.hostname, 'and baseUrl', req.baseUrl, 'and req.path', req.path);
 				url = `${req.protocol}://${req.hostname}${req.baseUrl}${req.path}?key=${key + password}`;
 				res.render('index', { url: url, secret: secret, error: undefined, found: false });
 				console.log('Inserted', doc.key, 'with ID', doc._id);
