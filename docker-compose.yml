@@ -1,8 +1,7 @@
-version: '3'
+name: r2b-test
 services:
-  r2b:
-    image: 52north/read2burn:1.0
-    container_name: read2burn
+  read2burn:
+    image: 52north/read2burn:latest
     restart: unless-stopped
     ports:
       - 3300:3300
