@@ -26,12 +26,14 @@ RUN apk update \
 FROM node:lts-alpine
 
 # Your contact info
-LABEL maintainer="Jürrens, Eike Hinderk <e.h.juerrens@52north.org>" \
+LABEL \
       org.opencontainers.image.authors="Jürrens, Eike Hinderk <e.h.juerrens@52north.org>" \
-      org.opencontainers.image.url="https://github.com/52North/read2burn.git" \
-      org.opencontainers.image.vendor="52°North GmbH" \
+      org.opencontainers.image.description="transport passwords more secure by email" \
       org.opencontainers.image.licenses="Apache-2.0" \
-      org.opencontainers.image.title="52°North Read 2 Burn Deployment"
+      org.opencontainers.image.title="read2burn by wemove forked by 52n" \
+      org.opencontainers.image.url="https://github.com/52North/read2burn" \
+      org.opencontainers.image.vendor="52°North Spatial Information Research GmbH"
+
 ENV READ2BURN_HOME="/app"
 
 WORKDIR ${READ2BURN_HOME}

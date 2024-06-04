@@ -48,12 +48,11 @@ jobs:
         with:
           images: 52north/read2burn
           labels: |
-            "org.opencontainers.image.url=https://github.com/52north/"
-            "org.opencontainers.image.source=https://github.com/52north/read2burn"
+            "org.opencontainers.image.authors=Jürrens, Eike Hinderk <e.h.juerrens@52north.org>"
+            "org.opencontainers.image.description=transport passwords more secure by email"
             "org.opencontainers.image.licenses=Apache-2.0"
             "org.opencontainers.image.title=read2burn by wemove forked by 52n"
-            "org.opencontainers.image.description=transport passwords more secure by email"
-            "org.opencontainers.image.authors=Jürrens, Eike Hinderk <e.h.juerrens@52north.org>"
+            "org.opencontainers.image.url=https://github.com/52north/read2burn"
             "org.opencontainers.image.vendor=52°North Spatial Information Research GmbH"
           tags: |
             type=match,pattern=v(.*),group=1,value=${{ github.event.inputs.tags }}
