@@ -190,7 +190,7 @@ select {
     padding: 6px 6px;
     outline: none;
     border-radius: 5px;
-    font: 14px 'Poppins-Regular', sans-serif;
+    font: 14px 'RobotoMono-Medium', monospace;
     color: #777;
     width: 210px;
     max-width: 100%;
@@ -229,5 +229,3 @@ legend span {
 .remove-bottom { margin-bottom: 0 !important; }
 .half-bottom { margin-bottom: 10px !important; }
 .add-bottom { margin-bottom: 20px !important; }
-
-

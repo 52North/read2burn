@@ -48,3 +48,11 @@ label {
   url('../fonts/Poppins-Medium.woff') format("woff"),
   url('../fonts/Poppins-Medium.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'RobotoMono-Medium';
+  src: url('../fonts/RobotoMono-Medium.eot');
+  src: url('../fonts/RobotoMono-Medium.eot?#iefix') format("embedded-opentype"),
+  url('../fonts/RobotoMono-Medium.woff') format("woff"),
+  url('../fonts/RobotoMono-Medium.ttf') format('truetype');
+}
