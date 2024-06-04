@@ -33,25 +33,33 @@ nodejs, npm, git
 
 ## Docker
 
-```sh
+*Here*: `<VERSION>` must be replaced with `latest` or any other version identifier following semantic versioning.
+
+```shell
+VERSION=<VERSION>
 git clone https://github.com/52North/read2burn.git .
-docker build --no-cache -t 52North/read2burn:<VERSION> .
+docker build --no-cache -t "52North/read2burn:$VERSION" .
 
 # push to 52North docker repository
 docker login docker.52North.org
-docker tag 52North/read2burn:<VERSION> docker.52North.org/52North/read2burn:<VERSION>
-docker push docker.52North.org/52North/read2burn:<VERSION>
+docker tag "52North/read2burn:$VERSION" "docker.52North.org/52North/read2burn:$VERSION"
+docker push "docker.52North.org/52North/read2burn:$VERSION"
 ```
 
 Run the image
 
-```sh
+*Here*:
+
+* `<VERSION>` must be replaced with the value used above.
+* `<RELATIVE PATH, IE '/r2b'>`must be replaced with a valid relativ path, e.g. `/r2b`.
+
+```shell
 docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data -e REL_PATH=<RELATIVE PATH, IE '/r2b'> --name read2burn 52North/read2burn:<VERSION>
 ```
 
-Apache config for sub paths
+Apache config for sub paths:
 
-```config
+```apacheconf
     RewriteRule ^/r2b$ %{HTTPS_HOST}/r2b/ [R=permanent,L]
     <Location /r2b/>
             ProxyPass http://localhost:3300/
