@@ -93,3 +93,30 @@ jobs:
           GIT_COMMIT=${{ github.sha }}
           BUILD_DATE=${{ steps.vars.outputs.build_date }}
           BUILD_ID=${{ steps.vars.outputs.build_id }}
+    -
+      name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      env:
+        #
+        # Using AWS repository to circumvent TOOMANYREQUEST error from github repository
+        #
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
+        #
+        # Original GitHub repository
+        #
+        # TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
+        # TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db:1
+        #
+        #
+        # Disable VEX notice
+        #
+        TRIVY_DISABLE_VEX_NOTICE: disable_vex_notice
+      with:
+        image-ref: "${{ env.IMAGE_TAG }}"
+        format: 'table'
+        output: 'trivy-results.txt'
+        exit-code: '0'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
