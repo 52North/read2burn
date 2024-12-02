@@ -120,3 +120,16 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
+    -
+      name: Trigger redeployment
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GHA_WORKFLOW_TRIGGER }}
+        script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: '${{ secrets.TRIGGER_ORGA }}',
+              repo: '${{ secrets.TRIGGER_REPO }}',
+              workflow_id: '${{ secrets.TRIGGER_WORKFLOW_1 }}',
+              ref: '${{ secrets.TRIGGER_REF }}'
+            })
+            console.log(result)
