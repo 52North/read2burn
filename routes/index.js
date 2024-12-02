@@ -17,12 +17,12 @@ exports.index = function (req, res) {
 		const cf = new CryptorFactory();
 
 		if (req.body.secret) {
-			
+
 			if (req.body.secret.length > 10000000) {
 				res.status(413);
 				res.send('Argument too large.');
 			}
-			
+
 			const cryptor = cf.createCurrent();
 			let found = false;
 			let key = null;
@@ -35,7 +35,7 @@ exports.index = function (req, res) {
 					}
 				});
 			} while (found);
-	
+
 			const timestamp = new Date().getTime();
 			const encrypted = cryptor.encrypt(secret);
 			const entry = { key, timestamp, encrypted }
@@ -58,7 +58,7 @@ exports.index = function (req, res) {
 			} else {
 
 				const key = crypt.parseKey(id);
-				
+
 				nedb.findOne({ key }, function (err, doc) {
 					if (err) {
 						res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
@@ -66,7 +66,7 @@ exports.index = function (req, res) {
 						try {
 							if (doc.encrypted && req.body.show) {
 								const encrypted = doc.encrypted;
-								
+
 								const decrypted = crypt.decrypt(encrypted, id);
 								nedb.remove({ key }, function (err, numDeleted) {
 									nedb.compactDatafile();
@@ -97,7 +97,7 @@ exports.index = function (req, res) {
 class CryptorFactory {
 	createFromVersion(version) {
 		switch (version) {
-			case 'v1': 
+			case 'v1':
 				return new CryptorV1();
 			default:
 				return new CryptorV2();
@@ -106,10 +106,10 @@ class CryptorFactory {
 
 	createFromId(id) {
 		switch (id.length) {
-			case 19: 
+			case 19:
 				return this.createFromVersion("v1");
 
-			default: 
+			default:
 				return this.createFromVersion("v2");
 		}
 	}
@@ -150,7 +150,7 @@ class Cryptor {
 		this.key = this.uid(this.KEY_LENGTH);
 		return this.key;
 	}
-	
+
 	uid(len) {
 		return base62.encode(crypto.randomBytes(len)).slice(0, len);
 	}
@@ -160,7 +160,7 @@ class Cryptor {
 
 /**
  * Deprecated, remove after 01.01.2025
- * 
+ *
  * This implementation is just used to decrypt existing deprecated secrets.
  */
 class CryptorV1 extends Cryptor {
