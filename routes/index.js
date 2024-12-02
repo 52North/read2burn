@@ -105,6 +105,9 @@ class CryptorFactory {
 	}
 
 	createFromId(id) {
+		if (typeof id !== 'string') {
+			throw new Error('Received non string id.');
+		}
 		switch (id.length) {
 			case 19:
 				return this.createFromVersion("v1");
@@ -181,6 +184,9 @@ class CryptorV1 extends Cryptor {
 	}
 
 	decrypt( message, id ) {
+		if (typeof id !== 'string') {
+			throw new Error('Received non string id.');
+		}
 		const password = id.slice(this.KEY_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH)
 		const decipherSecret = new Buffer.from(password).toString('binary');
 		const decipher = crypto.createDecipher(this.CIPHER_ALGORITHM, decipherSecret);
@@ -222,6 +228,9 @@ class CryptorV2 extends Cryptor {
 	}
 
 	decrypt(message, id ) {
+		if (typeof id !== 'string') {
+			throw new Error('Received non string id.');
+		}
 		const baseBuf = Buffer.from(id);
 		const password = baseBuf.subarray(this.KEY_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH)
 		const iV = baseBuf.subarray(this.KEY_LENGTH + this.PASSWORD_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH)
