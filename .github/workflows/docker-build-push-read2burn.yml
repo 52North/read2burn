@@ -3,6 +3,17 @@ concurrency:
   group: "read2burn"
   cancel-in-progress: true
 
+env:
+  BUILD_CONTEXT: .
+  IMAGE_AUTHORS: Jürrens, Eike Hinderk <e.h.juerrens@52north.org>
+  IMAGE_DESCRIPTION: transport passwords more secure by email
+  IMAGE_LICENSES: Apache-2.0
+  IMAGE_TAG: 52north/read2burn
+  IMAGE_TITLE: read2burn by wemove forked by 52n
+  IMAGE_VENDOR: 52°North Spatial Information Research GmbH
+  IMAGE_URL: https://github.com/52north/read2burn
+  METADATA_TAG_PATTERN: v(.*)
+
 on:
   workflow_dispatch:
     inputs:
@@ -51,16 +62,16 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: 52north/read2burn
+        images: "${{ env.IMAGE_TAG }}"
         labels: |
-          "org.opencontainers.image.authors=Jürrens, Eike Hinderk <e.h.juerrens@52north.org>"
-          "org.opencontainers.image.description=transport passwords more secure by email"
-          "org.opencontainers.image.licenses=Apache-2.0"
-          "org.opencontainers.image.title=read2burn by wemove forked by 52n"
-          "org.opencontainers.image.url=https://github.com/52north/read2burn"
-          "org.opencontainers.image.vendor=52°North Spatial Information Research GmbH"
+          "org.opencontainers.image.authors=${{ env.IMAGE_AUTHORS }}"
+          "org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}"
+          "org.opencontainers.image.licenses=${{ env.IMAGE_LICENSES }}"
+          "org.opencontainers.image.title=${{ env.IMAGE_TITLE }}"
+          "org.opencontainers.image.url=${{ env.IMAGE_URL }}"
+          "org.opencontainers.image.vendor=${{ env.IMAGE_VENDOR }}"
         tags: |
-          type=match,pattern=v(.*),group=1,value=${{ github.event.inputs.tags }}
+          type=match,pattern=${{ env.METADATA_TAG_PATTERN }},group=1,value=${{ github.event.inputs.tags }}
     -
       name: Log in to Docker Hub
       if: github.event_name != 'pull_request'
@@ -72,7 +83,7 @@ jobs:
       name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: .
+        context: "${{ env.BUILD_CONTEXT }}"
         cache-from: type=gha
         cache-to: type=gha
         push: ${{ github.event_name != 'pull_request' }}
