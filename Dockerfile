@@ -47,7 +47,7 @@ VOLUME ["${READ2BURN_HOME}/data"]
 CMD ["node", "app.js"]
 
 ARG GIT_COMMIT
-LABEL org.opencontainers.image.revision "${GIT_COMMIT}"
+LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 
 ARG BUILD_DATE
-LABEL org.opencontainers.image.created "${BUILD_DATE}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
