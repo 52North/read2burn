@@ -1,4 +1,7 @@
 name: docker build publish read2burn
+concurrency:
+  group: "read2burn"
+  cancel-in-progress: true
 
 on:
   workflow_dispatch:
