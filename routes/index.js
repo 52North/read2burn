@@ -188,7 +188,7 @@ class CryptorV1 extends Cryptor {
 	}
 
 	validateId(id) {
-		return id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH -1 && id.match(/^[a-z0-9]+$/);
+		return typeof id == 'string' && id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH -1 && id.match(/^[a-z0-9]+$/);
 	}
 
 
@@ -237,7 +237,7 @@ class CryptorV2 extends Cryptor {
 	}
 
 	validateId(id) {
-		return id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH + this.SALT_LENGTH && id.match(/^[a-zA-Z0-9]+$/);
+		return typeof id == 'string' && id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH + this.SALT_LENGTH && id.match(/^[a-zA-Z0-9]+$/);
 	}
 
 }
