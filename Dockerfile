@@ -48,6 +48,8 @@ CMD ["node", "app.js"]
 
 ARG GIT_COMMIT
 LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
+ENV GIT_COMMIT=${GIT_COMMIT}
 
 ARG BUILD_DATE
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
+ENV BUILD_DATE=${BUILD_DATE}
