@@ -52,7 +52,7 @@ Run the image
 *Here*:
 
 * `<VERSION>` must be replaced with the value used above.
-* `<RELATIVE PATH, IE '/r2b'>`must be replaced with a valid relativ path, e.g. `/r2b`.
+* `<RELATIVE PATH, IE '/r2b'>`must be replaced with a valid relative path, e.g. `/r2b`.
 
 ```shell
 docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data -e REL_PATH=<RELATIVE PATH, IE '/r2b'> --name read2burn 52North/read2burn:<VERSION>
