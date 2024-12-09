@@ -40,7 +40,11 @@ exports.index = function (req, res) {
 			const encrypted = cryptor.encrypt(secret);
 			const entry = { key, timestamp, encrypted }
 			nedb.insert(entry, function (err, doc) {
-				url = `${req.protocol}://${req.get('host')}/?id=${cryptor.getId()}`;
+				var url = `${req.protocol}://${req.hostname}${req.baseUrl}${req.path}`;
+				if (process.env.BASE_URL){
+					url = process.env.BASE_URL;
+				}
+				url = `${url}?id=${cryptor.getId()}`;
 				res.render('index', { url: url, secret: secret, error: undefined, found: false });
 				/*console.log('Inserted', doc.key, 'with ID', doc._id);*/
 			});
