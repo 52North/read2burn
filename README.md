@@ -34,28 +34,52 @@ nodejs, npm, git
 
 ## Docker
 
-*Here*: `<VERSION>` must be replaced with `latest` or any other version identifier following semantic versioning.
+*Here*: `<VERSION>` must be replaced with a version identifier following semantic versioning.
+
+### Build
 
 ```shell
-VERSION=<VERSION>
-git clone https://github.com/52North/read2burn.git .
-docker build --no-cache -t "52North/read2burn:$VERSION" .
+VERSION=0.12.2 \
+REGISTRY=docker.io \
+IMAGE=52north/read2burn \
+; \
+docker build --no-cache \
+  -t "${REGISTRY}/${IMAGE}:latest" \
+  -t "${REGISTRY}/${IMAGE}:${VERSION}" \
+  --build-arg BUILD_ID="$VERSION" \
+  --build-arg BUILD_DATE=$(date -u --iso-8601=seconds) \
+  --build-arg GIT_COMMIT=$(git rev-parse --short=20 -q --verify HEAD) \
+  .
+```
 
-# push to 52North docker repository
+### Publish
+
+Push to 52North docker repository
+
+```shell
 docker login docker.52North.org
 docker tag "52North/read2burn:$VERSION" "docker.52North.org/52North/read2burn:$VERSION"
-docker push "docker.52North.org/52North/read2burn:$VERSION"
+docker tag "52North/read2burn:latest" "docker.52North.org/52North/read2burn:latest"
+docker push --all-tags docker.52North.org/52North/read2burn
 ```
+
+### Run
 
 Run the image
 
 *Here*:
 
-* `<VERSION>` must be replaced with the value used above.
-* `<RELATIVE PATH, IE '/r2b'>`must be replaced with a valid relative path, e.g. `/r2b`.
+* To run another version than the "latest", replace `latest` in the command.
+* The value of the environment variable `REL_PATH` must be replaced with a valid relative path, e.g. `/r2b`.
 
 ```shell
-docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data -e REL_PATH=<RELATIVE PATH, IE '/r2b'> --name read2burn 52North/read2burn:<VERSION>
+docker run \
+   --rm \
+   -p 3300:3300 \
+   --volume=/tmp/read2burn/data:/app/data \
+   --env REL_PATH=/ \
+   --name read2burn \
+   "${REGISTRY}/${IMAGE}:latest"
 ```
 
 Apache config for sub paths:
