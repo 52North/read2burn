@@ -92,7 +92,7 @@ jobs:
         build-args: |
           GIT_COMMIT=${{ github.sha }}
           BUILD_DATE=${{ steps.vars.outputs.build_date }}
-          BUILD_ID=${{ steps.vars.outputs.build_id }}
+          BUILD_ID=${{ env.DOCKER_METADATA_OUTPUT_VERSION }}
     -
       name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
