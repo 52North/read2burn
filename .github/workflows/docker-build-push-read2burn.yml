@@ -80,6 +80,13 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
     -
+      name: Inject version, build date and commit ID into index.ejs
+      run: |
+        VERSION=${{ steps.meta.outputs.build_id }}
+        COMMIT=${{ github.sha }}
+        BUILD_DATE=${{ steps.vars.outputs.build_date }}
+        echo "<!-- Version: $VERSION, Commit ID: $COMMIT, Build date: $BUILD_DATE -->" >> views/index.ejs
+    -
       name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
