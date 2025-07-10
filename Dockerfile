@@ -53,3 +53,6 @@ ENV GIT_COMMIT=${GIT_COMMIT}
 ARG BUILD_DATE
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 ENV BUILD_DATE=${BUILD_DATE}
+
+ARG BUILD_ID
+RUN echo "<!-- Version: $BUILD_ID, Commit ID: $GIT_COMMIT, Build date: $BUILD_DATE -->" >> views/index.ejs
