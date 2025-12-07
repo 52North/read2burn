@@ -1,13 +1,39 @@
 # read2burn
 
-A simple application for more secure password transportation.
-It encrypts an entry and generates a secret link.
-Accessing the link displays the entry and removes it at the same time.
+A simple application for secure one-time secret sharing.  
+It encrypts a secret, generates a single-use access link, and deletes the secret as soon as it is viewed.
 
-The link can be sent by email and the email can be archived without compromising the secret entry (of course only if it has been accessed by the recipient once).
+The link can be sent safely via email and can even be archived afterward — as long as the recipient has accessed the secret once.
 
-Please have a look at <https://www.read2burn.com/>.
+Visit: <https://www.read2burn.com/>
 
+---
+
+##  Recent Improvements
+
+The application now includes several enhancements to improve security, reliability, and production readiness:
+
+###  Security Updates
+- **Secret Expiration (TTL):**  
+  Every stored secret now has a configurable time-to-live.  
+  If a secret is not accessed within the TTL period, it expires and is securely deleted.
+
+- **Clear Expiry UI:**  
+  Expired links now display a user-friendly `SECRET_EXPIRED` message instead of a generic error.
+
+- **Rate Limiting:**  
+  Limits excessive requests per IP to mitigate brute-force attempts and abuse.
+
+###  System Reliability
+- **Automatic Database Cleanup:**  
+  A periodic cron job removes expired or stale entries and compacts the NeDB datastore.
+
+- **Safer Production Defaults:**  
+  Helmet security headers and compression are enabled for better performance and security.
+
+These improvements maintain backwards compatibility while significantly strengthening the system.
+
+---
 ## Dependencies
 
 nodejs, npm, git

@@ -1,62 +1,81 @@
-/**
- * Module dependencies.
- */
-const express = require('express')
-    , http = require('http')
-    , path = require('path')
-    , Umzug = require('umzug')
-    , bodyParser = require('body-parser')
-    , cron = require('node-cron')
-    , Datastore = require('@seald-io/nedb')
-    , routes = require('./routes')
-    , i18n = require("i18n");
-;
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const Umzug = require('umzug');
+const bodyParser = require('body-parser');
+const cron = require('node-cron');
+const Datastore = require('@seald-io/nedb');
+const routes = require('./routes');
+const i18n = require('i18n');
+const compression = require('compression');
+const helmet = require('helmet');
 
 const app = express();
 const umzug = new Umzug();
 
-// default: using 'accept-language' header to guess language settings
-app.use(i18n.init);
-app.set('port', process.env.PORT || 3300);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-app.use(express.Router());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.enable('trust proxy');
-app.disable( 'x-powered-by' )
-
-const nedb = new Datastore({filename: 'data/read2burn.db', autoload: true});
-exports.nedb = nedb
-
-
+// i18n config (must be before init)
 i18n.configure({
-    locales: ['en', 'de'],
-    directory: __dirname + '/locales',
-    defaultLocale: 'en'
+  locales: ['en', 'de'],
+  directory: path.join(__dirname, 'locales'),
+  defaultLocale: 'en'
 });
 
+app.use(i18n.init);
+app.set('port', process.env.PORT || 3300);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// secure basics
+app.disable('x-powered-by');
+app.enable('trust proxy');
+
+// performance + security middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false
+  })
+);
+
+app.use(compression());
+
+// static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// payload size limit
+app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
+
+// database load
+const nedb = new Datastore({
+  filename: path.join(__dirname, 'data', 'read2burn.db'),
+  autoload: true
+});
+exports.nedb = nedb;
+
+// routing
 app.get('/', routes.index);
 app.post('/', routes.index);
 
-umzug.up().then(function (migrations) {
-    // "migrations" will be an Array with the names of the
-    // executed migrations.
+// migrations
+umzug.up().then(() => {});
+
+// periodic cleanup of expired secrets
+cron.schedule('*/10 * * * *', () => {
+  try {
+    const now = Date.now();
+    nedb.remove({ expiresAt: { $lte: now } }, { multi: true }, (err, numRemoved) => {
+      if (!err && numRemoved > 0) {
+        nedb.compactDatafile();
+      }
+    });
+  } catch (err) {
+    console.error('Error during periodic cleanup:', err);
+  }
 });
 
 // start server
-http.createServer(app).listen(app.get('port'), function () {
-    console.log("Express server listening on port " + app.get('port'));
+http.createServer(app).listen(app.get('port'), () => {
+  console.log('Server running on port ' + app.get('port'));
 });
-
-// schedule regular cleanup
-cron.schedule('12 1 * * *', function () {
-    console.log("Cleanup proceeding...")
-    const expireTime = new Date().getTime() - 8640000000;
-    nedb.remove({timestamp: {$lte: expireTime}}, { multi: true }, function(err, numDeleted) {
-        console.log('Deleted', numDeleted, 'entries');
-        nedb.persistence.compactDatafile();
-    });
-});
-
-
