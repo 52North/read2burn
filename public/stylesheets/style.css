@@ -158,6 +158,38 @@ p {
 #faq {
   margin-top: 34px !important;
   margin-bottom: 12px !important;
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #b86500;
+  background: #d97706;
+  color: #fff4e5;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease;
+}
+
+#faq a,
+#faq a:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+#faq:hover {
+  background: #ea8a1a;
+  border-color: #cf7408;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+#faq:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+#faq:focus-visible,
+#faq a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 244, 229, 0.3);
 }
 
 #faqContainer .sixteen.columns {
