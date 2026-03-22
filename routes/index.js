@@ -3,6 +3,14 @@ const crypto = require('crypto');
 const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const base62 = require('base-x')(BASE62);
 
+function buildShareUrl(req, id) {
+	const path = `?id=${id}`;
+	if (app.publicBaseUrl) {
+		return new URL(path, app.publicBaseUrl).toString();
+	}
+	return `${req.protocol}://${req.get('host')}/?id=${id}`;
+}
+
 exports.index = function (req, res) {
 	try {
 		const nedb = app.nedb;
@@ -36,7 +44,7 @@ exports.index = function (req, res) {
 			const encrypted = cryptor.encrypt(secret);
 			const entry = { key, timestamp, encrypted }
 			nedb.insert(entry, function (err, doc) {
-				url = `${req.protocol}://${req.get('host')}/?id=${cryptor.getId()}`;
+				url = buildShareUrl(req, cryptor.getId());
 				res.render('index', { url: url, secret: secret, error: undefined, found: false });
 			});
 		// parameter 'key' is deprecated, remove related code after 01.01.2025
