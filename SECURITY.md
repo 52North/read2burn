@@ -27,3 +27,8 @@ Include as much detail as possible:
 Please only test systems you own or are explicitly authorized to test.
 
 Do not run destructive tests, denial-of-service attempts, or access data belonging to others.
+
+## Cryptography Notes
+
+Newly created secrets use authenticated encryption, so ciphertext tampering is detected during decryption.
+Legacy secrets created by older versions may still use older encryption formats for backward compatibility.
