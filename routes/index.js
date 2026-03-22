@@ -113,27 +113,19 @@ exports.index = function (req, res) {
 
 
 class CryptorFactory {
-	createFromVersion(version) {
-		switch (version) {
-			case 'v1': 
-				return new CryptorV1();
+	V2_ID_LENGTH = CryptorV2.ID_LENGTH;
+
+	createFromId(id) {
+		switch (id.length) {
+			case this.V2_ID_LENGTH:
+				return new CryptorV2();
 			default:
 				return new CryptorV2();
 		}
 	}
 
-	createFromId(id) {
-		switch (id.length) {
-			case 19: 
-				return this.createFromVersion("v1");
-
-			default: 
-				return this.createFromVersion("v2");
-		}
-	}
-
 	createCurrent() {
-		return this.createFromVersion("CURRENT");
+		return new CryptorV2();
 	}
 
 }
@@ -175,48 +167,13 @@ class Cryptor {
 
 }
 
-
-/**
- * Deprecated, remove after 01.01.2025
- * 
- * This implementation is just used to decrypt existing deprecated secrets.
- */
-class CryptorV1 extends Cryptor {
-
-	PASSWORD_LENGTH = 12;
-	CIPHER_ALGORITHM = "aes256";
-
-	key = null;
-	password = null;
-
-	constructor() {
-		super();
-		this.KEY_LENGTH = 8;
-	}
-
-	encrypt( message ) {
-		throw new Error('Method not valid for this implementation.');
-	}
-
-	decrypt( message, id ) {
-		const password = id.slice(this.KEY_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH)
-		const decipherSecret = new Buffer.from(password).toString('binary');
-		const decipher = crypto.createDecipher(this.CIPHER_ALGORITHM, decipherSecret);
-		return decipher.update(message, 'hex', 'utf8') + decipher.final('utf8');
-	}
-
-	validateId(id) {
-		return id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH -1 && id.match(/^[a-z0-9]+$/);
-	}
-
-
-}
-
 class CryptorV2 extends Cryptor {
 
-	PASSWORD_LENGTH = 32;
-	IV_LENGTH = 16;
-	SALT_LENGTH = 16;
+	static KEY_LENGTH = 8;
+	static PASSWORD_LENGTH = 32;
+	static IV_LENGTH = 16;
+	static SALT_LENGTH = 16;
+	static ID_LENGTH = this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH + this.SALT_LENGTH;
 	CIPHER_ALGORITHM = "aes-256-cbc"
 
 	password = null;
@@ -225,14 +182,14 @@ class CryptorV2 extends Cryptor {
 
 	constructor() {
 		super();
-		this.KEY_LENGTH = 8;
+		this.KEY_LENGTH = CryptorV2.KEY_LENGTH;
 	}
 
 	encrypt( message ) {
 		// store in members to be used later to create the parameter 'id'
-		this.password  = Buffer.from(this.uid(this.PASSWORD_LENGTH)).subarray(0, 32);
-		this.iV = Buffer.from(this.uid(this.IV_LENGTH)).subarray(0, 16);
-		this.salt = Buffer.from(this.uid(this.SALT_LENGTH)).subarray(0, 16);
+		this.password  = Buffer.from(this.uid(CryptorV2.PASSWORD_LENGTH)).subarray(0, 32);
+		this.iV = Buffer.from(this.uid(CryptorV2.IV_LENGTH)).subarray(0, 16);
+		this.salt = Buffer.from(this.uid(CryptorV2.SALT_LENGTH)).subarray(0, 16);
 
 		const passKey = crypto.scryptSync(this.password, this.salt, 32);
 		const cipher = crypto.createCipheriv(this.CIPHER_ALGORITHM, passKey, this.iV);
@@ -241,9 +198,9 @@ class CryptorV2 extends Cryptor {
 
 	decrypt(message, id ) {
 		const baseBuf = Buffer.from(id);
-		const password = baseBuf.subarray(this.KEY_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH)
-		const iV = baseBuf.subarray(this.KEY_LENGTH + this.PASSWORD_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH)
-		const salt = baseBuf.subarray(this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH, this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH + this.SALT_LENGTH)
+		const password = baseBuf.subarray(CryptorV2.KEY_LENGTH, CryptorV2.KEY_LENGTH + CryptorV2.PASSWORD_LENGTH)
+		const iV = baseBuf.subarray(CryptorV2.KEY_LENGTH + CryptorV2.PASSWORD_LENGTH, CryptorV2.KEY_LENGTH + CryptorV2.PASSWORD_LENGTH + CryptorV2.IV_LENGTH)
+		const salt = baseBuf.subarray(CryptorV2.KEY_LENGTH + CryptorV2.PASSWORD_LENGTH + CryptorV2.IV_LENGTH, CryptorV2.KEY_LENGTH + CryptorV2.PASSWORD_LENGTH + CryptorV2.IV_LENGTH + CryptorV2.SALT_LENGTH)
 
 		const passKey = crypto.scryptSync(password, salt, 32);
 		const decipher = crypto.createDecipheriv(this.CIPHER_ALGORITHM, passKey, iV);
@@ -255,7 +212,7 @@ class CryptorV2 extends Cryptor {
 	}
 
 	validateId(id) {
-		return id.length == this.KEY_LENGTH + this.PASSWORD_LENGTH + this.IV_LENGTH + this.SALT_LENGTH && id.match(/^[a-zA-Z0-9]+$/);
+		return id.length == CryptorV2.ID_LENGTH && id.match(/^[a-zA-Z0-9]+$/);
 	}
 
 }
