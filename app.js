@@ -22,6 +22,28 @@ const envMaxSecretChars = Number.parseInt(process.env.READ2BURN_MAX_SECRET_CHARS
 const maxSecretChars = Number.isInteger(envMaxSecretChars) && envMaxSecretChars > 0
     ? envMaxSecretChars
     : DEFAULT_MAX_SECRET_CHARS;
+const envPublicBaseUrl = (process.env.READ2BURN_PUBLIC_URL || '').trim();
+let publicBaseUrl = '';
+if (envPublicBaseUrl) {
+    let parsedPublicBaseUrl;
+    try {
+        parsedPublicBaseUrl = new URL(envPublicBaseUrl);
+    } catch (err) {
+        throw new Error('READ2BURN_PUBLIC_URL must be a valid absolute URL.');
+    }
+    if (parsedPublicBaseUrl.protocol !== 'http:' && parsedPublicBaseUrl.protocol !== 'https:') {
+        throw new Error('READ2BURN_PUBLIC_URL must use http or https.');
+    }
+    // Keep optional base path to support context-path deployments.
+    if (!parsedPublicBaseUrl.pathname || parsedPublicBaseUrl.pathname === '') {
+        parsedPublicBaseUrl.pathname = '/';
+    } else if (!parsedPublicBaseUrl.pathname.endsWith('/')) {
+        parsedPublicBaseUrl.pathname = `${parsedPublicBaseUrl.pathname}/`;
+    }
+    parsedPublicBaseUrl.search = '';
+    parsedPublicBaseUrl.hash = '';
+    publicBaseUrl = parsedPublicBaseUrl.toString();
+}
 const maxSecretCharsWarning = Math.max(1, maxSecretChars - Math.max(10, Math.floor(maxSecretChars * 0.01)));
 const maxRequestBodyBytes = (maxSecretChars * URLENCODED_BYTES_PER_CHAR) + URLENCODED_FORM_OVERHEAD_BYTES;
 
@@ -42,6 +64,7 @@ const dbFile = process.env.READ2BURN_DB_FILE || 'data/read2burn.db';
 const nedb = new Datastore({filename: dbFile, autoload: true});
 exports.nedb = nedb
 exports.maxSecretChars = maxSecretChars;
+exports.publicBaseUrl = publicBaseUrl;
 
 
 i18n.configure({

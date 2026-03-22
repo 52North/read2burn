@@ -38,6 +38,22 @@ You can control the maximum secret length with:
 
 Default is `4000`.
 
+To force generated share links to always use a canonical base URL, set:
+
+    READ2BURN_PUBLIC_URL
+
+Example:
+
+    READ2BURN_PUBLIC_URL=https://read2burn.example.com
+
+When this is set, link generation ignores request host/protocol headers and always uses that base URL. If unset, the application keeps the original request-based behavior.
+
+You can also include a context path in this URL:
+
+    READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn
+
+Generated links will then use that prefix (for example `https://read2burn.example.com/read2burn/?id=...`).
+
 This value is used for both:
 
 - the client-side textarea counter (`maxChars`)
