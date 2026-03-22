@@ -62,6 +62,11 @@ app.disable( 'x-powered-by' )
 
 const dbFile = process.env.READ2BURN_DB_FILE || 'data/read2burn.db';
 const nedb = new Datastore({filename: dbFile, autoload: true});
+nedb.ensureIndex({ fieldName: 'key', unique: true }, function (err) {
+    if (err) {
+        console.error('Failed to ensure unique index on key field.', err);
+    }
+});
 exports.nedb = nedb
 exports.maxSecretChars = maxSecretChars;
 exports.publicBaseUrl = publicBaseUrl;
