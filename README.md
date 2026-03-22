@@ -29,6 +29,22 @@ Start the application.
     
     node app.js
 
+Configuration
+=============
+
+You can control the maximum secret length with:
+
+    READ2BURN_MAX_SECRET_CHARS
+
+Default is `4000`.
+
+This value is used for both:
+
+- the client-side textarea counter (`maxChars`)
+- the server-side secret length check in the route
+
+The URL-encoded body-parser limit is derived from this setting with additional transfer overhead, so requests are not rejected too early due to encoding expansion.
+
 
 Docker
 ======
@@ -41,7 +57,7 @@ Build the Docker image:
 
 Run the Docker container:
 
-    docker run -d -p 3300:3300 read2burn:latest
+    docker run -d -p 3300:3300 -e READ2BURN_MAX_SECRET_CHARS=4000 read2burn:latest
 
 This will start the application in a Docker container and map port 3300 of the container to port 3300 on your host machine. You can access the application by navigating to
 
@@ -58,7 +74,7 @@ If you prefer to use a pre-built image, you can pull the latest image from Docke
 
 Run the Docker container using the pulled image:
 
-    docker run -d -p 3300:3300 wemove/read2burn:latest
+    docker run -d -p 3300:3300 -e READ2BURN_MAX_SECRET_CHARS=4000 wemove/read2burn:latest
 
 For mor information and available releases, go here: https://hub.docker.com/r/wemove/read2burn
     

@@ -2,8 +2,11 @@ Run the docker
 
 ```
 docker pull wemove/read2burn:latest
-docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data --name read2burn 
+docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data --name read2burn -e READ2BURN_MAX_SECRET_CHARS=4000 wemove/read2burn:latest
 ```
+
+`READ2BURN_MAX_SECRET_CHARS` controls the maximum secret length and defaults to `4000`.
+The backend request-body limit is computed from this value with transfer overhead for URL encoding.
 
 Apache config for sub paths
 

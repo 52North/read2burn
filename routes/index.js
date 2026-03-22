@@ -7,6 +7,7 @@ exports.index = function (req, res) {
 	try {
 		const nedb = app.nedb;
 		const ERR_NO_SUCH_ENTRY = 'ERR_NO_SUCH_ENTRY';
+		const MAX_SECRET_CHARS = app.maxSecretChars || 4000;
 
 		let url = "";
 		let encrypted = "";
@@ -14,12 +15,10 @@ exports.index = function (req, res) {
 		const cf = new CryptorFactory();
 
 		if (req.body.secret) {
-			
-			if (req.body.secret.length > 10000000) {
+			if (req.body.secret.length > MAX_SECRET_CHARS) {
 				res.status(413);
-				res.send('Argument too large.');
+				return res.send('Argument too large.');
 			}
-			
 			const cryptor = cf.createCurrent();
 			let found = false;
 			let key = null;
@@ -50,7 +49,7 @@ exports.index = function (req, res) {
 
 			if (!crypt.validateId(id)) {
 				res.status(422);
-				res.send('Invalid argument.');
+				return res.send('Invalid argument.');
 			} else {
 
 				const key = crypt.parseKey(id);
