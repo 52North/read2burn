@@ -62,6 +62,20 @@ This value is used for both:
 The URL-encoded body-parser limit is derived from this setting with additional transfer overhead, so requests are not rejected too early due to encoding expansion.
 
 
+Security Trade-off (Current)
+============================
+
+At the moment, CSRF-specific protections (for example anti-CSRF tokens) are not enforced on the current POST endpoints by design.
+
+Rationale:
+
+- the app currently does not expose a formal authenticated API surface
+- these POST routes are primarily intended for browser form flow
+- adding strict CSRF/API protections now would constrain API-like request patterns planned for a later API boundary
+
+This decision will be revisited when introducing a real API. At that point, API authentication and CSRF strategy will be defined together.
+
+
 Docker
 ======
 
