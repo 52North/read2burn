@@ -11,6 +11,13 @@ function buildShareUrl(req, id) {
 	return `${req.protocol}://${req.get('host')}/?id=${id}`;
 }
 
+function isDuplicateKeyError(err) {
+	if (!err) return false;
+	if (err.errorType === 'uniqueViolated') return true;
+	const message = String(err.message || '').toLowerCase();
+	return message.includes('unique') && message.includes('key');
+}
+
 exports.index = function (req, res) {
 	try {
 		const nedb = app.nedb;
@@ -28,25 +35,28 @@ exports.index = function (req, res) {
 				return res.send('Argument too large.');
 			}
 			const cryptor = cf.createCurrent();
-			let found = false;
-			let key = null;
 			const secret = req.body.secret;
-			do {
-				key = cryptor.createKey();
-				nedb.findOne({ key }, function (err, doc) {
-					if (doc) {
-						found = true;
+			const MAX_INSERT_RETRIES = 10;
+
+			const insertSecretWithRetry = function (attempt) {
+				const key = cryptor.createKey();
+				const timestamp = new Date().getTime();
+				const encrypted = cryptor.encrypt(secret);
+				const entry = { key, timestamp, encrypted };
+				nedb.insert(entry, function (err, doc) {
+					if (err) {
+						if (isDuplicateKeyError(err) && attempt < MAX_INSERT_RETRIES) {
+							return insertSecretWithRetry(attempt + 1);
+						}
+						console.log(err);
+						res.status(500);
+						return res.send('Unexpected server error.');
 					}
+					url = buildShareUrl(req, cryptor.getId());
+					return res.render('index', { url: url, secret: secret, error: undefined, found: false });
 				});
-			} while (found);
-	
-			const timestamp = new Date().getTime();
-			const encrypted = cryptor.encrypt(secret);
-			const entry = { key, timestamp, encrypted }
-			nedb.insert(entry, function (err, doc) {
-				url = buildShareUrl(req, cryptor.getId());
-				res.render('index', { url: url, secret: secret, error: undefined, found: false });
-			});
+			};
+			insertSecretWithRetry(1);
 		// parameter 'key' is deprecated, remove related code after 01.01.2025
 		} else if (req.query.key || req.body.id || req.query.id) {
 			let id = req.query.key;
