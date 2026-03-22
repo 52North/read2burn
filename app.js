@@ -14,21 +14,34 @@ const express = require('express')
 
 const app = express();
 const umzug = new Umzug();
+const DEFAULT_MAX_SECRET_CHARS = 4000;
+const URLENCODED_BYTES_PER_CHAR = 12;
+const URLENCODED_FORM_OVERHEAD_BYTES = 8192;
+
+const envMaxSecretChars = Number.parseInt(process.env.READ2BURN_MAX_SECRET_CHARS || '', 10);
+const maxSecretChars = Number.isInteger(envMaxSecretChars) && envMaxSecretChars > 0
+    ? envMaxSecretChars
+    : DEFAULT_MAX_SECRET_CHARS;
+const maxSecretCharsWarning = Math.max(1, maxSecretChars - Math.max(10, Math.floor(maxSecretChars * 0.01)));
+const maxRequestBodyBytes = (maxSecretChars * URLENCODED_BYTES_PER_CHAR) + URLENCODED_FORM_OVERHEAD_BYTES;
 
 // default: using 'accept-language' header to guess language settings
 app.use(i18n.init);
 app.set('port', process.env.PORT || 3300);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.locals.maxSecretChars = maxSecretChars;
+app.locals.maxSecretCharsWarning = maxSecretCharsWarning;
 app.use(express.Router());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false, limit: `${maxRequestBodyBytes}b` }));
 app.enable('trust proxy');
 app.disable( 'x-powered-by' )
 
 const dbFile = process.env.READ2BURN_DB_FILE || 'data/read2burn.db';
 const nedb = new Datastore({filename: dbFile, autoload: true});
 exports.nedb = nedb
+exports.maxSecretChars = maxSecretChars;
 
 
 i18n.configure({
