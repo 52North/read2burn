@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       READ2BURN_MAX_SECRET_CHARS: ${READ2BURN_MAX_SECRET_CHARS:-4000}
+      READ2BURN_PUBLIC_URL: ${READ2BURN_PUBLIC_URL:-}
     ports:
       - 127.0.0.1:3300:3300
     volumes:
