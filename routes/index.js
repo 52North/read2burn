@@ -55,21 +55,36 @@ exports.index = function (req, res) {
 
 				const key = crypt.parseKey(id);
 				
-				nedb.findOne({ key }, function (err, doc) {
+				nedb.findOne({ key, consumed: { $ne: true } }, function (err, doc) {
 					if (err) {
 						res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
 					} else {
 						try {
-							if (doc.encrypted && req.body.show) {
-								const encrypted = doc.encrypted;
-								
-								const decrypted = crypt.decrypt(encrypted, id);
-								nedb.remove({ key }, function (err, numDeleted) {
-									nedb.compactDatafile();
-								});
-								res.render('index', { url: url, secret: decrypted, error: undefined, found: true });
-							} else {
+							if (doc && doc.encrypted && req.body.show) {
+								// Atomically claim the secret before decrypting to enforce read-once semantics.
+								nedb.update(
+									{ key, consumed: { $ne: true } },
+									{ $set: { consumed: true, consumedAt: new Date().getTime() } },
+									{ returnUpdatedDocs: true },
+									function (err, numAffected, affectedDoc) {
+										if (err || !numAffected || !affectedDoc || !affectedDoc.encrypted) {
+											return res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
+										}
+										try {
+											const decrypted = crypt.decrypt(affectedDoc.encrypted, id);
+											nedb.remove({ key, consumed: true }, function (err, numDeleted) {
+												nedb.compactDatafile();
+											});
+											return res.render('index', { url: url, secret: decrypted, error: undefined, found: true });
+										} catch (e) {
+											return res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
+										}
+									}
+								);
+							} else if (doc && doc.encrypted) {
 								res.render('index', { url: url, secret: false, error: undefined, found: true, id: id });
+							} else {
+								res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
 							}
 						} catch (e) {
 							res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false });
