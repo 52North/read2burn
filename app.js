@@ -26,7 +26,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.enable('trust proxy');
 app.disable( 'x-powered-by' )
 
-const nedb = new Datastore({filename: 'data/read2burn.db', autoload: true});
+const dbFile = process.env.READ2BURN_DB_FILE || 'data/read2burn.db';
+const nedb = new Datastore({filename: dbFile, autoload: true});
 exports.nedb = nedb
 
 
