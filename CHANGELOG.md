@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0]
+
+### Added
+
+- Add authenticated encryption for newly created secrets via `CryptorV3` (AES-256-GCM).
+- Add support for configuring a canonical public base URL via `READ2BURN_PUBLIC_URL` (used when generating share links).
+- Add support for configuring maximum secret length via `READ2BURN_MAX_SECRET_CHARS`.
+- Add database migration to deduplicate keys and enforce unique key constraints.
+- Add `SECURITY.md` and expand README security documentation.
+- Add tests covering encryption, public base URL handling, max secret length limits, key collision retries, and read-once race behavior.
+
+### Changed
+
+- Default to `CryptorV3` for new secrets; keep `CryptorV2` for decrypting existing IDs.
+- Remove deprecated `CryptorV1` and refactor crypto factory/implementations accordingly.
+- Update dependencies (including `qs`, `minimatch`, `underscore`).
+- Add `npm test` script using Node’s built-in test runner.
+
+### Fixed
+
+- Fix a race condition in database access that could break read-once behavior.
+
+### Security
+
+- Mitigate Host Header Injection by generating share URLs from `READ2BURN_PUBLIC_URL` when set.
+
 ## [0.7.4] - 2026-01-01
 
 ### Changed
