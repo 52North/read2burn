@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add GitHub Action to mirror the Docker Hub repository overview from `docker/readme.md`.
+
 ### Changed
 
 - Update Docker configuration to run as non-root user and adjust file permissions
@@ -124,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial version.
 
-[Unreleased]: https://github.com/wemove/read2burn/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/wemove/read2burn/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/wemove/read2burn/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/wemove/read2burn/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/wemove/read2burn/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/wemove/read2burn/compare/v0.7.1...v0.7.2
