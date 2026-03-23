@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update Docker configuration to run as non-root user and adjust file permissions
+- Update GitHub Actions Docker workflows to be compatible with the upcoming Node.js 24 runtime.
 
 ## [0.8.0]
 
