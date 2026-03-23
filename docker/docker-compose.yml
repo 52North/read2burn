@@ -3,6 +3,7 @@ services:
   read2burn:
     image: wemove/read2burn:latest
     restart: unless-stopped
+    user: "node"
     environment:
       READ2BURN_MAX_SECRET_CHARS: ${READ2BURN_MAX_SECRET_CHARS:-4000}
       READ2BURN_PUBLIC_URL: ${READ2BURN_PUBLIC_URL:-}

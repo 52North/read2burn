@@ -31,7 +31,12 @@ ENV READ2BURN_PUBLIC_URL=""
 
 WORKDIR ${READ2BURN_HOME}
 
-COPY --from=builder ${READ2BURN_HOME} .
+RUN mkdir -p "${READ2BURN_HOME}/data" \
+  && chown -R node:node "${READ2BURN_HOME}"
+
+COPY --from=builder --chown=node:node ${READ2BURN_HOME} .
+
+USER node
 
 EXPOSE 3300
 
