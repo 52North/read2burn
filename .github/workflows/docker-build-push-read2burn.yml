@@ -94,24 +94,41 @@ jobs:
           BUILD_DATE=${{ steps.vars.outputs.build_date }}
           BUILD_ID=${{ env.DOCKER_METADATA_OUTPUT_VERSION }}
     -
-      name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+      name: Run trivy vulnerability scanner
+      # get latest version from https://github.com/aquasecurity/trivy-action/releases
+      uses: aquasecurity/trivy-action@v0.35.0
       env:
-        #
-        # Using AWS repository to circumvent TOOMANYREQUEST error from github repository
-        #
         TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
         TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
-        #
-        # Original GitHub repository
-        #
-        # TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
-        # TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db:1
-        #
-        #
-        # Disable VEX notice
-        #
         TRIVY_DISABLE_VEX_NOTICE: disable_vex_notice
+      with:
+        scan-type: repo
+        scan-ref: '.'
+        format: json
+        output: trivy-results.json
+        exit-code: '0'
+        ignore-unfixed: true
+        vuln-type: os,library
+        scanners: vuln,secret,misconfig
+        severity: CRITICAL,HIGH
+    -
+      name: remove empty results
+      run: |
+        vulnerabilities=$(cat trivy-results.json | jq 'if (.Results | length) == 0 then 0 else [.Results[].Vulnerabilities | length] | add end'); \
+        if [[ "$vulnerabilities" -eq 0 ]]; then \
+          rm trivy-results.json
+        fi
+    -
+      if: ${{ hashFiles('trivy-results.json') != '' }}
+      name: 2nd scan to create human readable report
+      # get latest version from https://github.com/aquasecurity/trivy-action/releases
+      uses: aquasecurity/trivy-action@v0.35.0
+      env:
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+        TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db:1
+        TRIVY_DISABLE_VEX_NOTICE: disable_vex_notice
+        TRIVY_FORMAT: table
+        TRIVY_OUTPUT: trivy-results.txt
       with:
         image-ref: "${{ env.IMAGE_TAG }}"
         format: 'table'
@@ -120,6 +137,18 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
+    -
+      if: ${{ hashFiles('trivy-results.txt') != '' }}
+      name: Send Trivy Results to Google Chat
+      env:
+        WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+        REPO_NAME: ${{ github.repository }}
+        REPO_URL: "https://github.com/${{ github.repository }}/actions"
+      run: |
+        CONTENT=$(cat trivy-results.txt | head -c 3800)
+        MESSAGE="Trivy Results for '${REPO_NAME}':\n\n\`\`\`\n${TRIVY_CONTENT}\n\`\`\`\n\n(Results truncated) Please review full report at: ${REPO_URL}"
+        JSON_PAYLOAD=$(jq -n --arg msg "$MESSAGE" '{text: $msg}')
+        curl -X POST -H 'Content-Type: application/json' "$WEBHOOK_URL" -d "$JSON_PAYLOAD"  
     -
       name: Trigger redeployment
       uses: actions/github-script@v8
