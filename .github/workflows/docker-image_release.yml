@@ -22,16 +22,27 @@ jobs:
           fetch-depth: 0
 
       - name: Get the latest tag
-        id: read2burn  # The step ID to refer to later.
+        id: read2burn
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --tags --force
-          TAG="$(git tag --list | grep -E '^.+\.\d+\.\d+$' | sort -V | tail -n 1)"
-          if [ -z "${TAG:-}" ]; then
-            echo "No matching tags found." >&2
+          
+          # Ensure we have tags from the remote
+          git fetch --tags --force --unshallow || git fetch --tags --force
+
+          # Log all tags to the console for debugging
+          echo "Available tags:"
+          git tag --list
+
+          # We use '|| true' to prevent grep from killing the script if no match is found
+          TAG=$(git tag --list | grep -E '^.+\.\d+\.\d+$' | sort -V | tail -n 1 || true)
+
+          if [ -z "$TAG" ]; then
+            echo "::error::No matching tags found for regex '^.+\.\d+\.\d+$'"
             exit 1
           fi
+
+          echo "Found Tag: $TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
   
       - name: Checkout the latest tag if exists
