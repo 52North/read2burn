@@ -26,23 +26,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          
-          # Ensure we have tags from the remote
-          git fetch --tags --force --unshallow || git fetch --tags --force
 
-          # Log all tags to the console for debugging
-          echo "Available tags:"
-          git tag --list
+          # Only unshallow if the repository is actually shallow
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            echo "Repository is shallow. Unshallowing..."
+            git fetch --tags --force --unshallow
+          else
+            echo "Repository is already complete. Fetching tags..."
+            git fetch --tags --force
+          fi
 
-          # We use '|| true' to prevent grep from killing the script if no match is found
-          TAG=$(git tag --list | grep -E '^.+\.\d+\.\d+$' | sort -V | tail -n 1 || true)
+          # 1. We use [0-9] instead of \d for compatibility
+          # 2. We use '|| true' so grep failing doesn't kill the script before our custom error message
+          TAG=$(git tag --list | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
 
           if [ -z "$TAG" ]; then
-            echo "::error::No matching tags found for regex '^.+\.\d+\.\d+$'"
+            echo "::error::No matching tags found. Checked tags: $(git tag --list | tr '\n' ' ')"
             exit 1
           fi
 
-          echo "Found Tag: $TAG"
+          echo "Selected Tag: $TAG"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
   
       - name: Checkout the latest tag if exists
