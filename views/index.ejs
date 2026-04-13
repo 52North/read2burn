@@ -121,8 +121,8 @@
         }, 500);
     });
     $('#secret').jqEasyCounter({
-        'maxChars': 4000,
-        'maxCharsWarning': 3990,
+        'maxChars': <%= maxSecretChars %>,
+        'maxCharsWarning': <%= maxSecretCharsWarning %>,
         'msgFontSize': '12px',
         'msgFontColor': '#000',
         'msgFontFamily': 'Courier',

@@ -1,96 +1,110 @@
-# read2burn
+read2burn
+=========
 
-A simple application for more secure password transportation.
-It encrypts an entry and generates a secret link.
-Accessing the link displays the entry and removes it at the same time.
+A simple application for more secure password transportation. It encrypts an entry and generates a secret link. Accessing the link displays the entry and removes it at the same time.
 
-The link can be sent by email and the email can be archived without compromising the secret entry (of course only if it has been accessed by the recipient once).
+The link can be sent by email or social media. The link can be archived without compromising the secret entry (of cource only if it has been accessed by the receipient once).
 
-Please have a look at <https://www.read2burn.com/>.
+Please have a look at https://www.read2burn.com/
 
-## Dependencies
+
+Dependencies
+============
 
 nodejs, npm, git
 
-## Install
 
-1. Install the application:
+Install
+=======
 
-   ```sh
-   git clone https://github.com/52north/read2burn.git
-   ```
+Install the application.
 
-1. Load the required modules:
+    git clone https://github.com/wemove/read2burn.git
+    
+Load the required modules.
+    
+    npm install
+    
+Start the application.    
+    
+    node app.js
 
-   ```sh
-   npm install
-   ```
+Configuration
+=============
 
-1. Start the application:
+You can control the maximum secret length with:
 
-   ```sh
-   node app.js
-   ```
+    READ2BURN_MAX_SECRET_CHARS
 
-## Docker
+Default is `4000`.
 
-*Here*: `<VERSION>` must be replaced with a version identifier following semantic versioning.
+To force generated share links to always use a canonical base URL, set:
 
-### Build
+    READ2BURN_PUBLIC_URL
 
-```shell
-VERSION=0.12.2 \
-REGISTRY=docker.io \
-IMAGE=52north/read2burn \
-; \
-docker build --no-cache \
-  -t "${REGISTRY}/${IMAGE}:latest" \
-  -t "${REGISTRY}/${IMAGE}:${VERSION}" \
-  --build-arg BUILD_ID="$VERSION" \
-  --build-arg BUILD_DATE=$(date -u --iso-8601=seconds) \
-  --build-arg GIT_COMMIT=$(git rev-parse --short=20 -q --verify HEAD) \
-  .
-```
+Example:
 
-### Publish
+    READ2BURN_PUBLIC_URL=https://read2burn.example.com
 
-Push to 52North docker repository
+When this is set, link generation ignores request host/protocol headers and always uses that base URL. If unset, the application keeps the original request-based behavior.
 
-```shell
-docker login docker.52North.org
-docker tag "52North/read2burn:$VERSION" "docker.52North.org/52North/read2burn:$VERSION"
-docker tag "52North/read2burn:latest" "docker.52North.org/52North/read2burn:latest"
-docker push --all-tags docker.52North.org/52North/read2burn
-```
+You can also include a context path in this URL:
 
-### Run
+    READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn
 
-Run the image
+Generated links will then use that prefix (for example `https://read2burn.example.com/read2burn/?id=...`).
 
-*Here*:
+This value is used for both:
 
-* To run another version than the "latest", replace `latest` in the command.
-* The value of the environment variable `REL_PATH` must be replaced with a valid relative path, e.g. `/r2b`.
+- the client-side textarea counter (`maxChars`)
+- the server-side secret length check in the route
 
-```shell
-docker run \
-   --rm \
-   -p 3300:3300 \
-   --volume=/tmp/read2burn/data:/app/data \
-   --env REL_PATH=/ \
-   --name read2burn \
-   "${REGISTRY}/${IMAGE}:latest"
-```
+The URL-encoded body-parser limit is derived from this setting with additional transfer overhead, so requests are not rejected too early due to encoding expansion.
 
-Apache config for sub paths:
 
-```apacheconf
-RewriteRule ^/r2b$ %{HTTPS_HOST}/r2b/ [R=permanent,L]
-<Location /r2b/>
-      ProxyPass http://localhost:3300/
-      ProxyPassReverse http://localhost:3300/
-      ProxyPreserveHost On
-      RequestHeader set X-Forwarded-Proto "https"
-      RequestHeader set X-Forwarded-Ssl on
-</Location>
-```
+Security Trade-off (Current)
+============================
+
+At the moment, CSRF-specific protections (for example anti-CSRF tokens) are not enforced on the current POST endpoints by design.
+
+Rationale:
+
+- the app currently does not expose a formal authenticated API surface
+- these POST routes are primarily intended for browser form flow
+- adding strict CSRF/API protections now would constrain API-like request patterns planned for a later API boundary
+
+This decision will be revisited when introducing a real API. At that point, API authentication and CSRF strategy will be defined together.
+
+
+Docker
+======
+
+You can also run the application using Docker. Follow the steps below to build and run the Docker container.
+
+Build the Docker image:
+
+    docker build -t read2burn:latest -f docker/Dockerfile .
+
+Run the Docker container:
+
+    docker run -d -p 3300:3300 -e READ2BURN_MAX_SECRET_CHARS=4000 read2burn:latest
+
+This will start the application in a Docker container and map port 3300 of the container to port 3300 on your host machine. You can access the application by navigating to
+
+`http://localhost:3300` 
+
+in your web browser.
+
+Pulling from Docker Hub
+------------------------
+
+If you prefer to use a pre-built image, you can pull the latest image from Docker Hub:
+
+    docker pull wemove/read2burn:latest
+
+Run the Docker container using the pulled image:
+
+    docker run -d -p 3300:3300 -e READ2BURN_MAX_SECRET_CHARS=4000 wemove/read2burn:latest
+
+For mor information and available releases, go here: https://hub.docker.com/r/wemove/read2burn
+    
