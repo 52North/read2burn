@@ -19,6 +19,9 @@
   },
   "description": "A tool for communicating secret information.",
   "main": "app.js",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
   "devDependencies": {},
   "author": "wemove",
   "license": "MIT"

@@ -8,4 +8,4 @@ services:
 #    volumes:
 #      - ./data:/app/data
 #    environment:
-#      - REL_PATH=/r2b
+#      - READ2BURN_PUBLIC_URL=https://sh.example.com/read2burn
