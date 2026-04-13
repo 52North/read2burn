@@ -3,7 +3,7 @@
   "version": "0.12.2",
   "private": true,
   "dependencies": {
-    "@seald-io/nedb": "^4.0.2",
+    "@seald-io/nedb": "^4.1.2",
     "base-x": "^4.0.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.20.4",
@@ -11,10 +11,10 @@
     "ejs": "^3.1.10",
     "express": "^4.22.1",
     "extfs": "^0.0.7",
-    "i18n": "^0.15.1",
+    "i18n": "^0.15.3",
     "mv": "^2.1.1",
     "node-cron": "^3.0.3",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.10",
     "umzug": "^2.3.0"
   },
   "description": "A tool for communicating secret information.",
@@ -22,7 +22,11 @@
   "scripts": {
     "test": "node --test test/*.test.js"
   },
-  "devDependencies": {},
   "author": "wemove",
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "minimatch": "^10.2.5",
+    "picomatch": "^4.0.4",
+    "tar": "^7.5.11"
+  }
 }
