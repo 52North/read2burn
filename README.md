@@ -107,6 +107,17 @@ docker build --no-cache \
   .
 ```
 
+### Scan
+
+```shell
+trivy image \
+      --scanners vuln \
+      --format table \
+      --severity CRITICAL,HIGH \
+      --ignore-unfixed \
+      "${REGISTRY}/${IMAGE}:${VERSION}"
+```
+
 ## Publish
 
 Push to 52North docker repository
