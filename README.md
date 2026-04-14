@@ -143,7 +143,7 @@ docker run \
    --rm \
    -p 3300:3300 \
    --volume=/tmp/read2burn/data:/app/data \
-   --env READ2BURN_PUBLIC_URL=http://localhost/ \
+   --env READ2BURN_PUBLIC_URL=http://localhost:3300/ \
    --env READ2BURN_MAX_SECRET_CHARS=4000 \
    --name read2burn \
    "${REGISTRY}/${IMAGE}:latest"
