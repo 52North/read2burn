@@ -23,7 +23,7 @@ RUN apk update \
 ####################
 # Create image
 
-FROM node:lts-alpine
+FROM alpine:3.23.3
 
 # Your contact info
 LABEL \
@@ -44,7 +44,13 @@ EXPOSE 3300
 
 VOLUME ["${READ2BURN_HOME}/data"]
 
-CMD ["node", "app.js"]
+# Install ONLY nodejs (without npm) and tzdata
+RUN apk update \
+ && apk upgrade --no-cache \
+ && apk add --no-cache \
+            nodejs \
+            tzdata \
+            tini
 
 ARG GIT_COMMIT
 LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
@@ -56,3 +62,6 @@ ENV BUILD_DATE=${BUILD_DATE}
 
 ARG BUILD_ID
 RUN echo "<!-- Version: $BUILD_ID, Commit ID: $GIT_COMMIT, Build date: $BUILD_DATE -->" >> views/index.ejs
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "app.js"]
