@@ -1,6 +1,6 @@
 name: docker build publish read2burn
 concurrency:
-  group: "read2burn"
+  group: read2burn
   cancel-in-progress: true
 
 env:
@@ -11,7 +11,7 @@ env:
   IMAGE_TAG: 52north/read2burn
   IMAGE_TITLE: read2burn by wemove forked by 52n
   IMAGE_VENDOR: 52°North Spatial Information Research GmbH
-  IMAGE_URL: https://github.com/52north/read2burn
+  IMAGE_URL: https://github.com/52North/read2burn
   METADATA_TAG_PATTERN: v(.*)
 
 on:
@@ -30,13 +30,14 @@ jobs:
   build_and_publish:
     name: docker build publish image
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         language: [ 'javascript' ]
     steps:
     -
       name: Checkout Repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     -
       name: Declare variables and resolve Tag
       id: vars
